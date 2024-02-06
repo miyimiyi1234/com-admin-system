@@ -20,9 +20,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class UserController {
     private final UserService userService;
     
-    @GetMapping
-    public String getUser(Model model){
-        model.addAttribute("user",userService.getAllUsers());
+     @GetMapping
+    public String getUsers(Model model){
+        model.addAttribute("users", userService.getAllUsers());
         return "users";
     }
 }

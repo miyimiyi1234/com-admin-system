@@ -52,7 +52,7 @@ public class RegistrationCompleteEventListener implements ApplicationListener<Re
 
     public void sendVerificationEmail(String url) throws MessagingException, UnsupportedEncodingException {
         String subject = "Email Verification";
-        String senderName = "Users Verification Service";
+        String senderName = "Users Verification Service";   
         String mailContent = "<p> Hi, " + user.getFirstName() + ", </p>"
                 + "<p>Thank you for registering with us," + ""
                 + "Please, follow the link below to complete your registration.</p>"
