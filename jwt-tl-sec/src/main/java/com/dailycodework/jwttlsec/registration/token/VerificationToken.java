@@ -4,6 +4,7 @@
  */
 package com.dailycodework.jwttlsec.registration.token;
 
+import com.dailycodework.jwttlsec.utility.TokenExpirationTime;
 import com.dailycodework.jwttlsec.user.User;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

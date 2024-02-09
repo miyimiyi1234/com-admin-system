@@ -60,6 +60,17 @@ public class RegistrationCompleteEventListener implements ApplicationListener<Re
                 + "<p> Thank you <br> Users Registration Portal Service";
         emailMessage(subject, senderName, mailContent, mailSender, user);
     }
+    
+    public void sendPasswordVerificationEmail(String url) throws MessagingException, UnsupportedEncodingException {
+        String subject = "Password reset request verification";
+        String senderName = "Users Verification Service";   
+        String mailContent = "<p> Hi,"+user.getFirstName()+ ", </p>"+
+                "<p><b>You recently requested to reset your password,</b>"+"" +
+                "Please, follow the link bellow to complete the action. </p>"+
+                "<a href=\""+url+"\">Reset password</a>"+
+                "<p> Users registration portal service";
+        emailMessage(subject, senderName, mailContent, mailSender, user);
+    }
 
     private static void emailMessage(String subject, String senderName,
             String mailContent, JavaMailSender mailSender, User theUser)

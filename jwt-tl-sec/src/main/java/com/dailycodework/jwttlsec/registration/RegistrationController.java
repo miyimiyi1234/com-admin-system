@@ -5,13 +5,20 @@
 package com.dailycodework.jwttlsec.registration;
 
 import com.dailycodework.jwttlsec.event.RegistrationCompleteEvent;
+import com.dailycodework.jwttlsec.event.listener.RegistrationCompleteEventListener;
+import com.dailycodework.jwttlsec.registration.password.PasswordResetTokenService;
 import com.dailycodework.jwttlsec.registration.token.VerificationToken;
 import com.dailycodework.jwttlsec.registration.token.VerificationTokenService;
 import com.dailycodework.jwttlsec.user.User;
 import com.dailycodework.jwttlsec.user.UserService;
 import com.dailycodework.jwttlsec.utility.UrlUtility;
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Controller;
@@ -31,10 +38,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequestMapping("/registration")
 public class RegistrationController {
      private final UserService userService;
-     
      private final ApplicationEventPublisher publisher;
-     
      private final VerificationTokenService tokenService;
+     private final PasswordResetTokenService passwordResetTokenService;
+     private final RegistrationCompleteEventListener eventListener;
      
      @GetMapping("/registration-form")
      public String showRegistrationForm(Model model){
@@ -65,5 +72,36 @@ public class RegistrationController {
              default:
                  return "redirect:/error?invalid";
          }
+     }
+     
+     @GetMapping("/forgot-password-request")
+     public String forgotPassword(){
+         return "forgot-password-form";
+     }
+     
+     @PostMapping("/forgot-password")
+     public String resetPasswordRequest(HttpServletRequest request, Model model){
+         String email = request.getParameter("email");
+         User user = userService.findByEmail(email);
+         if (user == null) {
+             return "redirect:/registration/forgot-password-request?not_found";
+         }
+         String passwordResetToken = UUID.randomUUID().toString();
+         passwordResetTokenService.createPasswordRestTokenForUser(user, passwordResetToken);
+         //send verification email for the user
+         String url = UrlUtility.getApplicationUrl(request)+"/registration/password-reset-form?token="+passwordResetToken;
+         try {
+             eventListener.sendPasswordVerificationEmail(url);
+         } catch (MessagingException | UnsupportedEncodingException e) {
+             model.addAttribute("error",e.getMessage());
+         }
+         return "redirect:/registration/forgot-password-request?success";
+     }
+     
+     
+     @GetMapping("/reset-password-form")
+     public String passwordResetForm(@RequestParam("token") String token, Model model){
+         model.addAttribute("token",token);
+         return "password-reset-form"; 
      }
 }   
